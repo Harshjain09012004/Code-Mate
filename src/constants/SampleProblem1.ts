@@ -1,7 +1,7 @@
 export default {
     problemStatement: `
 
-## LeetCode Problem 688: Knight Probability in Chessboard 
+## Knight Probability in Chessboard 
 
 <br />
 
