@@ -16,7 +16,7 @@ const JoinRoom: React.FC = () => {
 
     const initRoom = () => {
         console.log("Initialising a req to create a room", socket)
-        setconnecting(true); socket.emit("create-room");
+        setconnecting(true); setconnected(false); socket.emit("create-room");
     }
 
     const join = () => {
