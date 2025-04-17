@@ -4,6 +4,7 @@ import { SocketContext } from "../context/SocketContext";
 import { IoCopyOutline } from "react-icons/io5";
 import { IoCopy } from "react-icons/io5";
 import { CircularProgress } from '@mui/material';
+import { IoCheckmarkDoneCircleOutline } from "react-icons/io5";
 
 const JoinRoom: React.FC = () => {
     const [room, setroom] = useState('');
@@ -11,6 +12,7 @@ const JoinRoom: React.FC = () => {
     const { socket } = useContext(SocketContext);
     const [copied, setcopied] = useState(false);
     const [connecting, setconnecting] = useState(false);
+    const [connected, setconnected] = useState(true);
 
     const initRoom = () => {
         console.log("Initialising a req to create a room", socket)
@@ -26,7 +28,7 @@ const JoinRoom: React.FC = () => {
 
     socket.on("room-created", ({roomId} : {roomId:string})=>{
         setroom(roomId); setcopied(false);
-        setconnecting(false);
+        setconnecting(false); setconnected(true)
     })
 
     return (
@@ -47,11 +49,29 @@ const JoinRoom: React.FC = () => {
             </div>
             
             {connecting && (
-              <div className="flex gap-5 place-items-center">
-                <p className="text-xl font-medium">Connecting To Server</p>
-                <CircularProgress className="text-sm"/>
+              <div className="flex flex-col gap-5 place-items-center">
+                <div className="flex gap-5 place-items-center">
+                  <p className="text-xl font-medium">Connecting To Server</p>
+                  <CircularProgress className="text-sm"/>
+                </div>
+
+                <div className="text-center">
+                  <p className="text-sm text-gray-400">It will take approximately 2 minutes.</p>
+                  <p className="text-sm text-gray-400">As server sleeps every 15 minutes of inactivity.</p>
+                </div>
               </div>
             )}  
+
+            {connected && (
+              <div className="flex gap-3 place-items-center">
+                <div className="flex flex-col gap-1 text-center">
+                  <p className="text-lg font-medium">Room Created Successfully</p>
+                  <p className="text-lg font-medium">➡️ Now Press Join Room</p>
+                </div>
+
+                <IoCheckmarkDoneCircleOutline className="text-6xl"/>
+              </div>
+            )}
             
             <div className="flex gap-10">
               <button 
