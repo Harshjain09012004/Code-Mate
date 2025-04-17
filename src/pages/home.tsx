@@ -12,7 +12,7 @@ const JoinRoom: React.FC = () => {
     const { socket } = useContext(SocketContext);
     const [copied, setcopied] = useState(false);
     const [connecting, setconnecting] = useState(false);
-    const [connected, setconnected] = useState(true);
+    const [connected, setconnected] = useState(false);
 
     const initRoom = () => {
         console.log("Initialising a req to create a room", socket)
