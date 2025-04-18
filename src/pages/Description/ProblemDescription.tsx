@@ -52,12 +52,11 @@ function Description({ descriptionText }: {descriptionText: string}) {
     useEffect(()=>{
        socket.emit("join-room", {roomId: id, peerId: "43635"});
 
-       if(clientId){
-        socket.emit("sync-my-code", {clientId: clientId, roomId: id});
-       }
+    //    if(clientId){
+    //     socket.emit("sync-my-code", {clientId: clientId, roomId: id});
+    //    }
 
        socket.on("update-code", ({newCode}: {newCode: string})=>{
-        console.log("the latest code", newCode);
         setCode(newCode);
        })
     }, [socket, id, clientId]);
@@ -151,7 +150,7 @@ function Description({ descriptionText }: {descriptionText: string}) {
                 </div>
 
                 {messaging && (
-                    <MessagePanel/>
+                    <MessagePanel roomId={id ? id : ''}/>
                 )}
 
                 {share && (
