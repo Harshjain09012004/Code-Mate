@@ -12,11 +12,14 @@ import { MdOutlineDraw } from "react-icons/md";
 import { IoVideocamOutline } from "react-icons/io5";
 import { PiChats } from "react-icons/pi";
 import { HiOutlineUsers } from "react-icons/hi2";
+import { HiOutlineShare } from "react-icons/hi2";
 import Drawing from '../../components/drawing';
 import Navbar from '../../components/Navbar';
 import SideBar from '../../components/SideBar';
 import { SocketContext } from '../../context/SocketContext';
 import { useParams } from 'react-router-dom';
+import SharePanel from '../../components/sharePanel';
+import MessagePanel from '../../components/messagePanel';
 
 type languageSupport = {
     languageName: string,
@@ -40,7 +43,9 @@ function Description({ descriptionText }: {descriptionText: string}) {
     const [theme, setTheme] = useState('monokai');
     const [status, setstatus] = useState('Submit');
     const [codingMode, setcodingMode] = useState(true);
-    
+    const [share, setshare] = useState(false);
+    const [messaging, setmessaging] = useState(false);
+
     const { socket, clientId } = useContext(SocketContext);
     const { id } = useParams();
 
@@ -127,17 +132,33 @@ function Description({ descriptionText }: {descriptionText: string}) {
             onMouseUp={stopDragging}
             >
 
-                <div className='AdvancedFeaturesPanel flex flex-col gap-10 h-full text-3xl p-3 bg-gray-800'>
+                <div className='AdvancedFeaturesPanel flex flex-col gap-11 h-full text-3xl p-4 bg-gray-800'>
                     <PiCodeBold title='Switch to coding' className='cursor-pointer active:scale-105' onClick={()=>setcodingMode(true)}/>
 
                     <MdOutlineDraw title='Switch to drawing' className='cursor-pointer active:scale-105' onClick={()=>setcodingMode(false)}/>
 
                     <IoVideocamOutline title='Start a session' className='cursor-pointer active:scale-105'/>
 
-                    <PiChats title='Messaging' className='cursor-pointer active:scale-105' />
+                    <PiChats title='Messaging' className='cursor-pointer active:scale-105' onClick={()=>{
+                        setmessaging(!messaging);
+                    }}/>
 
                     <HiOutlineUsers title='Participants' className='cursor-pointer active:scale-105'/>
+
+                    <HiOutlineShare title='Invite Your Friends' className='cursor-pointer active:scale-105' onClick={()=>{
+                        setshare(!share);
+                    }}/>
                 </div>
+
+                {messaging && (
+                    <MessagePanel/>
+                )}
+
+                {share && (
+                    <div className='absolute z-10 h-[calc(100vh-64px)] w-full flex place-items-center justify-center backdrop-brightness-50'>
+                        <SharePanel share={share} setshare={setshare} roomId={id ? id : ''}/>
+                    </div>
+                )}
 
                 <div className='leftPanel h-full overflow-auto' style={{ width: `${leftWidth}%`}}>
 
