@@ -1,9 +1,10 @@
-import React, { useContext, useState } from "react";
+import { useContext, useState, Dispatch, SetStateAction } from "react";
 import { VscSend } from "react-icons/vsc";
 import { SocketContext } from "../context/SocketContext";
 
-const MessagePanel = ({roomId}: {roomId: string}) => {
-  const [messages, setmessages] = useState<string[]>([]);
+const MessagePanel = ({roomId, messages, setmessages}: 
+  {roomId: string, messages: string[], setmessages: Dispatch<SetStateAction<string[]>>}) => {
+  
   const {socket} = useContext(SocketContext);
   const [userMessage, setuserMessage] = useState('');
 

@@ -45,6 +45,7 @@ function Description({ descriptionText }: {descriptionText: string}) {
     const [codingMode, setcodingMode] = useState(true);
     const [share, setshare] = useState(false);
     const [messaging, setmessaging] = useState(false);
+    const [messages, setmessages] = useState<string[]>([]);
 
     const { socket, clientId } = useContext(SocketContext);
     const { id } = useParams();
@@ -150,7 +151,7 @@ function Description({ descriptionText }: {descriptionText: string}) {
                 </div>
 
                 {messaging && (
-                    <MessagePanel roomId={id ? id : ''}/>
+                    <MessagePanel roomId={id ? id : ''} messages={messages} setmessages={setmessages}/>
                 )}
 
                 {share && (

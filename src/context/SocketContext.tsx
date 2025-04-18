@@ -6,9 +6,7 @@ import { v4 as UUIDv4 } from "uuid";
 import { PeerReducer } from "../Reducers/peerReducers";
 import { addPeerAction } from "../Actions/peerAction";
 
-// const WS_Server = "https://code-mate-ws-service.onrender.com";
-
-const WS_Server = "http://localhost:5500";
+const WS_Server = "https://code-mate-ws-service.onrender.com";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const SocketContext = createContext<any | null>(null);
