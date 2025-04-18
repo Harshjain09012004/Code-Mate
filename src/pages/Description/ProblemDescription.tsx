@@ -20,6 +20,7 @@ import { SocketContext } from '../../context/SocketContext';
 import { useParams } from 'react-router-dom';
 import SharePanel from '../../components/sharePanel';
 import MessagePanel from '../../components/messagePanel';
+import Participants from '../../components/participants';
 
 type languageSupport = {
     languageName: string,
@@ -38,24 +39,35 @@ function Description({ descriptionText }: {descriptionText: string}) {
     const [testCaseTab, setTestCaseTab] = useState('input');
     const [leftWidth, setLeftWidth] = useState(50);
     const [isDragging, setIsDragging] = useState(false);
+    
     const [language, setLanguage] = useState('javascript');
     const [code, setCode] = useState('');
     const [theme, setTheme] = useState('monokai');
     const [status, setstatus] = useState('Submit');
+
     const [codingMode, setcodingMode] = useState(true);
     const [share, setshare] = useState(false);
     const [messaging, setmessaging] = useState(false);
+    const [participants, setparticipants] = useState(false);
     const [messages, setmessages] = useState<string[]>([]);
 
-    const { socket, clientId } = useContext(SocketContext);
+    const { socket, clientId, userName, setuserName } = useContext(SocketContext);
     const { id } = useParams();
 
     useEffect(()=>{
        socket.emit("join-room", {roomId: id, peerId: "43635"});
 
-    //    if(clientId){
-    //     socket.emit("sync-my-code", {clientId: clientId, roomId: id});
-    //    }
+       // Take the input for userName by Prompt
+       if(!userName){
+        const name = prompt("Enter Your Room Name");
+        setuserName(name); console.log(userName);
+        socket.emit("map-id-name", {clientId, userName: name});
+       }
+       else socket.emit("map-id-name", {clientId, userName});
+
+    // if(clientId){
+    //    socket.emit("sync-my-code", {clientId: clientId, roomId: id});
+    // }
 
        socket.on("update-code", ({newCode}: {newCode: string})=>{
         setCode(newCode);
@@ -143,7 +155,9 @@ function Description({ descriptionText }: {descriptionText: string}) {
                         setmessaging(!messaging);
                     }}/>
 
-                    <HiOutlineUsers title='Participants' className='cursor-pointer active:scale-105'/>
+                    <HiOutlineUsers title='Participants' className='cursor-pointer active:scale-105' onClick={()=>{
+                        setparticipants(!participants);
+                    }}/>
 
                     <HiOutlineShare title='Invite Your Friends' className='cursor-pointer active:scale-105' onClick={()=>{
                         setshare(!share);
@@ -152,6 +166,10 @@ function Description({ descriptionText }: {descriptionText: string}) {
 
                 {messaging && (
                     <MessagePanel roomId={id ? id : ''} messages={messages} setmessages={setmessages}/>
+                )}
+
+                {participants && (
+                    <Participants roomId={id ? id : ''}/>
                 )}
 
                 {share && (

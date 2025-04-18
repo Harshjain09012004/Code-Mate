@@ -1,6 +1,10 @@
-import { VscAccount } from "react-icons/vsc";
+import Avatar from 'react-avatar';
+import { useContext } from "react";
+import { SocketContext } from "../context/SocketContext";
 
 function Navbar() {
+    const { userName } = useContext(SocketContext);
+
     return (
         <div className="navbar bg-base-100 border-b-2 h-[55px]">
             <div className="navbar-start">
@@ -30,7 +34,7 @@ function Navbar() {
                 </div>
                 <div className="dropdown dropdown-end">
                 <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-                    <VscAccount className="text-2xl"/>
+                    <Avatar name={userName} round='5px' size="35" />
                 </div>
                 <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
                     <li>

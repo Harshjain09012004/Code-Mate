@@ -16,6 +16,14 @@ const socket = SocketIoClient(WS_Server, {
     transports: ["polling", "websocket"]
 });
 
+
+//Storing client socketId
+let CurrentClientId: string = "";
+socket.on("hi", ({id}: {id:string})=>{
+    console.log("Fetched Id", id);
+    CurrentClientId = id;
+})
+
 interface Props {
     children: React.ReactNode
 }
@@ -25,12 +33,8 @@ export const SocketProvider: React.FC<Props> = ({ children }) => {
     const [user, setuser] = useState<Peer>();//Peer user
     const [stream, setstream] = useState<MediaStream>();
     const [peers, dispatch] = useReducer(PeerReducer, {});
-    const [clientId, setClientId] = useState<string>();
-
-    //Storing client socketId
-    socket.on("client-socketId", (id)=>{
-        setClientId(id);
-    })
+    const [clientId, setclientId] = useState<string>();
+    const [userName, setuserName] = useState<string>('');
 
     const fetchUserFeed = async ()=>{
         const userStream = await navigator.mediaDevices.getUserMedia({video:true, audio:true});
@@ -57,6 +61,7 @@ export const SocketProvider: React.FC<Props> = ({ children }) => {
         // };
         fetchUserFeed();
 
+        setclientId(CurrentClientId);
         // socket.on("room-created", enterRoom);
         socket.on("get-users", fetchParticipants);
     },[]);
@@ -89,7 +94,7 @@ export const SocketProvider: React.FC<Props> = ({ children }) => {
     }, [user, stream]);
 
     return (
-        <SocketContext.Provider value={{ socket, user, stream, peers, clientId}}>
+        <SocketContext.Provider value={{ socket, user, stream, peers, clientId, userName, setuserName}}>
             {children}
         </SocketContext.Provider>
     );

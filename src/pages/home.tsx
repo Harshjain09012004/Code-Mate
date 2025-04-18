@@ -8,8 +8,9 @@ import { IoCheckmarkDoneCircleOutline } from "react-icons/io5";
 
 const JoinRoom: React.FC = () => {
     const [room, setroom] = useState('');
+    const [user, setuser] = useState('');
     const navigate = useNavigate();
-    const { socket } = useContext(SocketContext);
+    const { socket, setuserName} = useContext(SocketContext);
     const [copied, setcopied] = useState(false);
     const [connecting, setconnecting] = useState(false);
     const [connected, setconnected] = useState(false);
@@ -20,10 +21,14 @@ const JoinRoom: React.FC = () => {
     }
 
     const join = () => {
-      if(room){
+      if(room && user){
+        setuserName(user);
         navigate(`/room/${room}`);
       }
-      else alert("Enter a roomId or create a new");
+      else if(!room){
+        alert("Enter a roomId or create a new");
+      } 
+      else alert("Enter Your Name Before Joining");
     }
 
     socket.on("room-created", ({roomId} : {roomId:string})=>{
@@ -35,19 +40,25 @@ const JoinRoom: React.FC = () => {
         <div className="h-full w-full flex justify-center place-items-center place-content-center">
           <div className="border p-10 rounded-xl border-gray-700 bg-zinc-900 shadow-gray-600 shadow-sm flex flex-col justify-center place-items-center place-content-center gap-16">
 
-            <div className="flex gap-5 place-items-center">
-              <input id="room" type="text" className=" rounded-xl w-64 bg-black text-gray-300  border-gray-500 border p-3" placeholder="Enter Room Code Ex: 6a3-s930" value={room} onChange={(e)=>{
-                  setroom(e.target.value);
-              }}/>
+            <div className="flex flex-col gap-5">
+              <div className="flex gap-5 place-items-center">
+                <input id="room" type="text" className=" rounded-xl w-64 bg-black text-gray-300  border-gray-500 border p-3" placeholder="Create Room or Enter Code Here" value={room} onChange={(e)=>{
+                    setroom(e.target.value);
+                }}/>
 
-              {!copied && <IoCopyOutline title="Copy to Clipboard" className="text-2xl cursor-pointer active:scale-110 transition-all" onClick={()=>{
-                navigator.clipboard.writeText(room);
-                if(room) setcopied(true);
-              }}/>}
-              
-              {copied && <IoCopy title="Copied to Clipboard" className="text-2xl cursor-pointer active:scale-110 transition-all"/>}
-            </div>
+                {!copied && <IoCopyOutline title="Copy to Clipboard" className="text-2xl cursor-pointer active:scale-110 transition-all" onClick={()=>{
+                  navigator.clipboard.writeText(room);
+                  if(room) setcopied(true);
+                }}/>}
+                
+                {copied && <IoCopy title="Copied to Clipboard" className="text-2xl cursor-pointer active:scale-110 transition-all"/>}
+              </div>
             
+              <input id="name" type="text" className=" rounded-xl w-64 bg-black text-gray-300  border-gray-500 border p-3" placeholder="Enter Your Name Ex: Harsh Jain" value={user} onChange={(e)=>{
+                    setuser(e.target.value);
+              }}/>
+            </div>
+
             {connecting && (
               <div className="flex flex-col gap-5 place-items-center">
                 <div className="flex gap-5 place-items-center">
@@ -77,7 +88,7 @@ const JoinRoom: React.FC = () => {
               <button 
                   type="button"
                   onClick={join}
-                  className="bg-indigo-500 text-lg rounded-xl p-3 active:scale-105 transition-all"
+                  className="bg-indigo-500 text-lg rounded-xl p-3 px-4 active:scale-105 transition-all"
               >
                   Join Room
               </button>
@@ -85,7 +96,7 @@ const JoinRoom: React.FC = () => {
               <button 
                   type="button"
                   onClick={initRoom}
-                  className="bg-indigo-500 text-lg rounded-xl p-3 active:scale-105 transition-all"
+                  className="bg-indigo-500 text-lg rounded-xl p-3 px-4 active:scale-105 transition-all"
               >
                   Create Room
               </button>
