@@ -1,30 +1,52 @@
-# React + TypeScript + Vite
+# Code-Mate Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Code-Mate is a collaborative platform designed to help multiple users work together on coding problems in real-time. It provides an interactive environment with features like a drawing board, messaging, and room-based collaboration, making it an ideal tool for pair programming, group problem-solving, and coding interviews.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Real-Time Collaboration**: Work with multiple users in real-time.
+- **Room-Based Structure**: Create or join rooms for focused collaboration.
+- **User Identification**: Each user is identified by a name.
+- **Drawing Board**: Visualize ideas and workflows with an integrated drawing board.
+- **Messaging System**: Communicate seamlessly with team members.
 
-## Expanding the ESLint configuration
+## Real-Time Communication
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+The real-time communication for Code-Mate is powered by the server named [Code-Mate-WS-Service](https://github.com/Harshjain09012004/Code-Mate-WS-Service). This service handles all WebSocket-based communication, ensuring a smooth and responsive collaborative experience.
 
-- Configure the top-level `parserOptions` property like this:
+## Getting Started
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
+### Prerequisites
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+- Node.js and npm installed on your system.
+- A running instance of the [Code-Mate-WS-Service](https://github.com/Harshjain09012004/Code-Mate-WS-Service).
+
+### Installation
+
+1. Clone the repository:
+  ```bash
+  git clone https://github.com/your-username/Code-Mate-Frontend.git
+  cd Code-Mate-Frontend
+  ```
+
+2. Install dependencies:
+  ```bash
+  npm install
+  ```
+
+3. Start the development server:
+  ```bash
+  npm run dev
+  ```
+
+4. Open your browser and navigate to `http://localhost:5173`.
+
+## Usage
+
+1. A Panel will open, which allow you to create a room and then join or join a room with a code
+2. Share the room ID with collaborators.
+3. Start solving coding problems together using the provided tools.
+
+## Contributing
+
+Contributions are welcome! Please fork the repository and submit a pull request with your changes.
