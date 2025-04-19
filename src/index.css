@@ -13,5 +13,8 @@
     h3 {
       @apply text-2xl;
     }
+    body{
+      @apply font-sora;
+    }
     
   }

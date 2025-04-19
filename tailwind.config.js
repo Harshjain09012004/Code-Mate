@@ -7,7 +7,15 @@ export default {
     './src/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
-    extend: {},
+    extend:  {
+      fontFamily: {
+        cabin: ['Cabin', 'sans-serif'],
+        marcellus: ['Marcellus', 'serif'],
+        pacifico: ['Pacifico', 'cursive'],
+        poppins: ['Poppins', 'sans-serif'],
+        sora: ['Sora', 'sans-serif'],
+      },
+    },
   },
   plugins: [daisyui, typography,],
   daisyui: {

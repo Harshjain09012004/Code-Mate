@@ -21,6 +21,7 @@ import { useParams } from 'react-router-dom';
 import SharePanel from '../../components/sharePanel';
 import MessagePanel from '../../components/messagePanel';
 import Participants from '../../components/participants';
+import UserName from '../../components/userName';
 
 type languageSupport = {
     languageName: string,
@@ -51,28 +52,24 @@ function Description({ descriptionText }: {descriptionText: string}) {
     const [participants, setparticipants] = useState(false);
     const [messages, setmessages] = useState<string[]>([]);
 
-    const { socket, clientId, userName, setuserName } = useContext(SocketContext);
+    const { socket, userName } = useContext(SocketContext);
     const { id } = useParams();
 
     useEffect(()=>{
        socket.emit("join-room", {roomId: id, peerId: "43635"});
 
-       // Take the input for userName by Prompt
-       if(!userName){
-        const name = prompt("Enter Your Room Name");
-        setuserName(name); console.log(userName);
-        socket.emit("map-id-name", {clientId, userName: name});
-       }
-       else socket.emit("map-id-name", {clientId, userName});
+        if(userName){
+            socket.emit("myId");
 
-    // if(clientId){
-    //    socket.emit("sync-my-code", {clientId: clientId, roomId: id});
-    // }
+            socket.on("Id", ({id}: {id: string})=>{
+                socket.emit("map-id-name", {clientId: id, userName: userName});
+            })
+        }
 
-       socket.on("update-code", ({newCode}: {newCode: string})=>{
-        setCode(newCode);
-       })
-    }, [socket, id, clientId]);
+        socket.on("update-code", ({newCode}: {newCode: string})=>{
+            setCode(newCode);
+        })
+    }, [socket, id, userName]);
 
     async function handleSubmission() {
         try {
@@ -131,8 +128,6 @@ function Description({ descriptionText }: {descriptionText: string}) {
         }
     }
 
-
-
     return (
         <>
             <Navbar />
@@ -175,6 +170,12 @@ function Description({ descriptionText }: {descriptionText: string}) {
                 {share && (
                     <div className='absolute z-10 h-[calc(100vh-64px)] w-full flex place-items-center justify-center backdrop-brightness-50'>
                         <SharePanel share={share} setshare={setshare} roomId={id ? id : ''}/>
+                    </div>
+                )}
+
+                {!userName && (
+                    <div className='absolute z-10 h-[calc(100vh-64px)] w-full flex place-items-center justify-center backdrop-brightness-50'>
+                        <UserName/>
                     </div>
                 )}
 
