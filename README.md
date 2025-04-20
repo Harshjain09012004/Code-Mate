@@ -1,6 +1,7 @@
 # Code-Mate - Interactive Coding Platform.
 
-### Visit the Code-Mate [Platform Link](https://code-mate-ten.vercel.app/).
+🔗 **Live Demo**: [Click here to view the deployed application](https://code-mate-ten.vercel.app/)
+
 
 Code-Mate is a collaborative platform designed to help multiple users work together on coding problems in real-time. It provides an interactive environment with features like a drawing board, messaging, and room-based collaboration, making it an ideal tool for pair programming, group problem-solving, and coding interviews.
 
