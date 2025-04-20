@@ -1,14 +1,26 @@
 export default [
     {
-        languageName: 'CPP', value: 'CPP',   
+        languageName: 'Javascript', value: 63,
     },
     {
-        languageName: 'Java', value: 'JAVA',
+        languageName: 'CPP', value: 54,   
     },
     {
-        languageName: 'Javascript', value: 'javascript',
+        languageName: 'Java', value: 62,
     },
     {
-        languageName: 'Python', value: 'PYTHON',
+        languageName: 'Python', value: 71,
+    }
+    ,
+    {
+        languageName: 'Ruby', value: 72,
+    }
+    ,
+    {
+        languageName: 'TypeScript', value: 74,
+    }
+    ,
+    {
+        languageName: 'R', value: 80,
     }
 ]

@@ -9,7 +9,7 @@ import Languages from '../../constants/Languages';
 import Themes from '../../constants/Themes';
 import { PiCodeBold } from "react-icons/pi";
 import { MdOutlineDraw } from "react-icons/md";
-import { IoVideocamOutline } from "react-icons/io5";
+// import { IoVideocamOutline } from "react-icons/io5";
 import { PiChats } from "react-icons/pi";
 import { HiOutlineUsers } from "react-icons/hi2";
 import { HiOutlineShare } from "react-icons/hi2";
@@ -22,10 +22,11 @@ import SharePanel from '../../components/sharePanel';
 import MessagePanel from '../../components/messagePanel';
 import Participants from '../../components/participants';
 import UserName from '../../components/userName';
+import Judge0Response from '../../types/judge0Response.types';
 
 type languageSupport = {
     languageName: string,
-    value: string
+    value: number
 }
 
 type themeStyle = {
@@ -41,16 +42,19 @@ function Description({ descriptionText }: {descriptionText: string}) {
     const [leftWidth, setLeftWidth] = useState(50);
     const [isDragging, setIsDragging] = useState(false);
     
-    const [language, setLanguage] = useState('javascript');
+    const [language, setLanguage] = useState('63');
     const [code, setCode] = useState('');
     const [theme, setTheme] = useState('monokai');
     const [status, setstatus] = useState('Submit');
+    const [input, setinput] = useState('');
+    const [output, setoutput] = useState<string|null>('Your Output Will Appear Here');
 
     const [codingMode, setcodingMode] = useState(true);
     const [share, setshare] = useState(false);
     const [messaging, setmessaging] = useState(false);
     const [participants, setparticipants] = useState(false);
-    const [messages, setmessages] = useState<string[]>([]);
+    const [messages, setmessages] = useState<{userName:string, userMessage:string}[]>([]);
+    const [codeError, setcodeError] = useState(false);
 
     const { socket, userName } = useContext(SocketContext);
     const { id } = useParams();
@@ -68,26 +72,56 @@ function Description({ descriptionText }: {descriptionText: string}) {
 
         socket.on("update-code", ({newCode}: {newCode: string})=>{
             setCode(newCode);
-        })
+        });
+
+        socket.on("execution-updates", ({data}: {data: Judge0Response})=>{
+            const {stderr, stdout, status} = data;
+
+            if(stderr){
+                setoutput(stderr); setcodeError(true);
+            }
+            else{
+                setcodeError(false);
+                setstatus(status.description);
+                setoutput(stdout);
+            }
+        });
+
     }, [socket, id, userName]);
 
     async function handleSubmission() {
         try {
-            console.log(code);
-            console.log(language);
-            setstatus('Pending');
+            if(code){
+                setstatus('Pending'); 
 
-            const response = await axios.post("http://localhost:5000/api/v1/submissions", {
-                code,
-                language,
-                userId: "123",
-                problemId: "120"
-            });
-            console.log(response);
-            return response;
-        } catch(error) {
-            console.log(error);
+                const response = await axios.post("http://localhost:5500/run", {
+                    code,
+                    language,
+                    input,
+                });
+
+                const {status, err} = response.data;
+
+                if(err){
+                    setcodeError(true);
+                    throw new Error(err);
+                }
+                else{
+                    setcodeError(false);
+                    setstatus(status);
+                }
+            }
+        } 
+        catch(error){
+            console.log("error", error);
             setstatus("Error");
+        }
+        finally{
+            setTestCaseTab("output");
+
+            setTimeout(() => {
+                setstatus("Submit");
+            }, 30000);
         }
     }
 
@@ -144,7 +178,7 @@ function Description({ descriptionText }: {descriptionText: string}) {
 
                     <MdOutlineDraw title='Switch to drawing' className='cursor-pointer active:scale-105' onClick={()=>setcodingMode(false)}/>
 
-                    <IoVideocamOutline title='Start a session' className='cursor-pointer active:scale-105'/>
+                    {/* <IoVideocamOutline title='Start a session' className='cursor-pointer active:scale-105'/> */}
 
                     <PiChats title='Messaging' className='cursor-pointer active:scale-105' onClick={()=>{
                         setmessaging(!messaging);
@@ -179,7 +213,7 @@ function Description({ descriptionText }: {descriptionText: string}) {
                     </div>
                 )}
 
-                <div className='leftPanel h-full overflow-auto' style={{ width: `${leftWidth}%`}}>
+                <div className='leftPanel h-full [scrollbar-width:thin] overflow-auto' style={{ width: `${leftWidth}%`}}>
 
                     <div role="tablist" className="tabs tabs-boxed w-3/5">
                         <a onClick={() => setActiveTab('statement')} role="tab" className={isActiveTab("statement")}>Problem Statement</a>
@@ -200,18 +234,19 @@ function Description({ descriptionText }: {descriptionText: string}) {
                 <div className='rightPanel h-full overflow-auto flex flex-col' style={{ width: `${100-leftWidth}%`}}>
                     {codingMode && (
                         <div className="flex flex-col editor-console grow-[1] ">
-                            <div className='flex gap-x-1.5 justify-start items-center px-4 py-2 basis-[5%]'>
+                            <div className='flex gap-4 justify-start items-center px-4 py-2 basis-[5%]'>
+
                                 <div>
-                                    <button className="btn btn-success btn-sm" onClick={handleSubmission}>{status || 'Submit'}</button>
+                                    <button type="button" className="btn btn-success btn-sm px-5" onClick={handleSubmission}>{status || 'Submit'}</button>
                                 </div>
-                                <div>
-                                    <button className="btn btn-warning btn-sm">Run Code</button>
-                                </div>
+        
                                 <div>
                                     <select
                                         className="select select-info w-full select-sm max-w-xs"
                                         value={language}
-                                        onChange={(e) => setLanguage(e.target.value)}
+                                        onChange={(e) =>{
+                                            setLanguage(e.target.value);
+                                        }}
                                         title='Select Language'
                                     >
 
@@ -220,6 +255,7 @@ function Description({ descriptionText }: {descriptionText: string}) {
                                         ))}
                                     </select>
                                 </div>
+
                                 <div>
                                     <select
                                         className="select select-info w-full select-sm max-w-xs"
@@ -259,16 +295,28 @@ function Description({ descriptionText }: {descriptionText: string}) {
 
                             <div className="collapse bg-base-200 rounded-none">
                                 <input placeholder='Input Data' type="checkbox" className="peer" />
-                                <div className="collapse-title bg-primary text-primary-content peer-checked:bg-secondary peer-checked:text-secondary-content">
+                                <div className="collapse-title font-medium text-center text-lg text-white bg-zinc-850 peer-checked:bg-gray-800 peer-checked:text-gray-300">
                                     Console
                                 </div>
-                                <div className="collapse-content bg-primary text-primary-content peer-checked:bg-secondary peer-checked:text-secondary-content">
+
+                                <div className="collapse-content bg-gray-900 text-primary-content peer-checked:bg-gray-800 peer-checked:text-secondary-content flex flex-col place-items-center">
                                     <div role="tablist" className="tabs tabs-boxed w-3/5 mb-4">
                                         <a onClick={() => setTestCaseTab('input')} role="tab" className={isInputTabActive('input')}>Input</a>
                                         <a onClick={() => setTestCaseTab('output')} role="tab" className={isInputTabActive('output')}>Output</a>
                                     </div>
 
-                                    {(testCaseTab === 'input') ? <textarea rows={4} cols={70} className='bg-neutral text-white rounded-md resize-none' placeholder='Enter Test Case' /> : <div className='w-12 h-8'></div>}
+                                    {(testCaseTab === 'input') ? 
+                                        <textarea rows={4} cols={75} 
+                                        className='bg-neutral text-gray-300 rounded-md resize-none p-1 outline-none' 
+                                        placeholder='Enter Test Case' value={input} 
+                                        onChange={(e)=>{
+                                            setinput(e.target.value);
+                                        }}/> 
+                                        : 
+                                        <div className={`bg-neutral min-h-28 max-h-40 w-full overflow-y-auto overflow-x-auto ${codeError ? 'text-red-500' : 'text-gray-300'} rounded-md p-2 [scrollbar-width:thin]`}>
+                                            <pre>{output}</pre>
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         </div>

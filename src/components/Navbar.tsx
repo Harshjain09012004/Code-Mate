@@ -11,15 +11,15 @@ function Navbar() {
                 <div className="dropdown">
                 <label htmlFor="my-drawer">
                     <div role="button" className="btn btn-ghost btn-circle">
-                        
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
-                        
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
                     </div>
                 </label>
                 </div>
             </div>
-            <div className="navbar-center">
-                <a className="btn btn-ghost text-xl">Code-Mate</a>
+
+            <div className="navbar-center flex gap-2">
+                <img src={'/logo.png'} width={'50px'} alt='Logo'/>
+                <a className="text-2xl font-bold">Code-Mate</a>
             </div>
             <div className="navbar-end">
                 <div className="dropdown dropdown-end">

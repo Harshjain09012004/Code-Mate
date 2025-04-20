@@ -26,7 +26,10 @@ const JoinRoom: React.FC = () => {
         navigate(`/room/${room}`);
       }
       else if(!room){
-        alert("Enter a roomId or create a new");
+        alert(
+          "1. Have a room code? Enter it and click 'Join Room'.\n" +
+          "2. Don't have code? Click 'Create Room' to generate then click Join"
+        );
       } 
       else alert("Enter Your Name Before Joining");
     }
@@ -37,7 +40,20 @@ const JoinRoom: React.FC = () => {
     })
 
     return (
-        <div className="h-full w-full flex justify-center place-items-center place-content-center">
+        <div className="h-full w-full flex justify-center place-items-center place-content-center gap-14">
+
+          <div className="flex gap-5 place-items-center">
+
+            <div className="flex flex-col gap-3 place-items-center">
+              <p className="text-center text-3xl font-semibold">Code Together. Grow Together.</p>
+              
+              <p className="text-center text-3xl font-semibold">Join the Community Now.</p>
+            </div>
+
+            <img src="/logo.png" alt="Community" width={'110px'}/>
+
+          </div>
+
           <div className="border p-10 rounded-xl border-gray-700 bg-zinc-900 shadow-gray-600 shadow-sm flex flex-col justify-center place-items-center place-content-center gap-16">
 
             <div className="flex flex-col gap-5">
@@ -88,7 +104,7 @@ const JoinRoom: React.FC = () => {
               <button 
                   type="button"
                   onClick={join}
-                  className="bg-indigo-500 text-lg rounded-xl p-3 px-4 active:scale-105 transition-all"
+                  className="bg-indigo-500 font-medium text-lg rounded-xl p-3 px-4 active:scale-105 transition-all"
               >
                   Join Room
               </button>
@@ -96,7 +112,7 @@ const JoinRoom: React.FC = () => {
               <button 
                   type="button"
                   onClick={initRoom}
-                  className="bg-indigo-500 text-lg rounded-xl p-3 px-4 active:scale-105 transition-all"
+                  className="bg-indigo-500 font-medium text-lg rounded-xl p-3 px-4 active:scale-105 transition-all"
               >
                   Create Room
               </button>

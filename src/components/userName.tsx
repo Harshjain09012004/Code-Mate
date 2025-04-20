@@ -6,15 +6,17 @@ const UserName = () => {
   const {socket, userName, setuserName} = useContext(SocketContext);
 
   const handleSave = ()=>{
-    setuserName(name); 
+    if(name){
+      setuserName(name); 
 
-    socket.emit("myId");
+      socket.emit("myId");
 
-    socket.on("Id", ({id}: {id: string})=>{
+      socket.on("Id", ({id}: {id: string})=>{
 
-        socket.emit("map-id-name", {clientId: id, userName: name});
-        setname('');
-    })
+          socket.emit("map-id-name", {clientId: id, userName: name});
+          setname('');
+      })
+    }
   }
 
   return (

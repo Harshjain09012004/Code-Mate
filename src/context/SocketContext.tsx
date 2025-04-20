@@ -32,10 +32,10 @@ export const SocketProvider: React.FC<Props> = ({ children }) => {
         setstream(userStream);
     }
 
-    const fetchParticipants = ({roomId, participants}: {roomId: string, participants: string[]})=>{
-        console.log("Fetching room and its participants");
-        console.log(roomId, participants);
-    };
+    // const fetchParticipants = ({roomId, participants}: {roomId: string, participants: string[]})=>{
+    //     console.log("Fetching room and its participants");
+    //     console.log(roomId, participants);
+    // };
 
     useEffect(()=>{
         const userId = UUIDv4();
@@ -48,7 +48,7 @@ export const SocketProvider: React.FC<Props> = ({ children }) => {
 
         fetchUserFeed();
         
-        socket.on("get-users", fetchParticipants);
+        // socket.on("get-users", fetchParticipants);
     },[]);
 
     useEffect(()=>{
