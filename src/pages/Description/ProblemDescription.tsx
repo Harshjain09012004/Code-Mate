@@ -94,7 +94,7 @@ function Description({ descriptionText }: {descriptionText: string}) {
             if(code){
                 setstatus('Pending'); 
 
-                const response = await axios.post("http://localhost:5500/run", {
+                const response = await axios.post("https://code-mate-ws-service.onrender.com/run", {
                     code,
                     language,
                     input,
