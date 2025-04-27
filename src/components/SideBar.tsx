@@ -23,7 +23,6 @@ function SideBar({setdescription, settitle}: {
             limit: 10,
             skip: 0
         }).then(({data})=>{
-            console.log(data.questions)
             setproblems(data.questions);
         })
         .catch((err)=>{
@@ -69,9 +68,9 @@ function SideBar({setdescription, settitle}: {
             
             <div className="drawer-side">
                 <label htmlFor="my-drawer" aria-label="close sidebar" className="drawer-overlay"></label>
-                <div className="menu p-4 min-h-full bg-base-200 text-base-content text-lg flex flex-col gap-5 border-r">
+                <div className="menu p-4 min-h-full bg-base-200 text-base-content text-lg flex flex-col gap-4 border-r">
                     <div className="flex justify-center gap-5 place-items-center">
-                        <p className="text-2xl font-bold m-3">
+                        <p className="text-2xl font-bold mb-3">
                             Problem List 
                         </p>
 
@@ -87,17 +86,28 @@ function SideBar({setdescription, settitle}: {
                         </div>
                     )}
 
-                    {(!loading && problems) && problems.map((problem)=>(
-                        <div className={`flex gap-3 text-lg ${problem.isPaidOnly ? 'text-gray-500 cursor-not-allowed' : 'cursor-pointer'} border border-gray-500 p-1 rounded-xl bg-gray-900 hover:${problem.isPaidOnly ? 'bg-gray-900' : 'bg-gray-700'} hover:${problem.isPaidOnly ? '' : 'scale-100'} transition-all`}
-                        onClick={()=>{
-                            handleProblemDescription(problem.titleSlug, problem.questionId);
-                        }}>
+                    {(!loading && problems) && problems.map((problem) => {
+                        const isPaid = problem.isPaidOnly;
+
+                        const baseClasses = "flex gap-2 text-md border border-gray-500 p-1 rounded-xl bg-gray-900 transition-all";
+                        const cursorClass = isPaid ? "text-gray-500 cursor-not-allowed" : "cursor-pointer";
+                        const hoverClass = isPaid ? "hover:bg-gray-900" : "hover:bg-gray-700 hover:scale-100";
+
+                        return (
+                            <div
+                            className={`${baseClasses} ${cursorClass} ${hoverClass}`}
+                            onClick={() => {
+                                if (!isPaid) handleProblemDescription(problem.titleSlug, problem.questionId);
+                            }}
+                            key={problem.questionId}
+                            >
                             <a>{problem.questionId}</a>
                             <a>{problem.title}</a>
-                        </div>
-                    ))}
+                            </div>
+                        );
+                    })}
 
-                    <div className="flex mt-5 justify-center border rounded-md border-gray-700 p-2 bg-slate-800">
+                    <div className="flex mt-5 justify-center border rounded-md border-gray-700 p-1 bg-slate-800">
                         <Pagination
                             count={100} 
                             color="primary" 
