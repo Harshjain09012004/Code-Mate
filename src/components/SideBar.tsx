@@ -32,7 +32,7 @@ function SideBar({setdescription, settitle}: {
     },[]);
 
     const handleChangePage = async (
-        event: React.ChangeEvent<unknown>,
+        _event: React.ChangeEvent<unknown>,
         newPage: number,
     ) => {
         try{
