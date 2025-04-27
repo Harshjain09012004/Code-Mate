@@ -88,7 +88,7 @@ function SideBar({setdescription, settitle}: {
                     )}
 
                     {(!loading && problems) && problems.map((problem)=>(
-                        <div className={`flex gap-3 ${problem.isPaidOnly ? 'text-gray-500 cursor-not-allowed' : 'cursor-pointer'} border border-gray-500 p-1 rounded-xl bg-gray-900 hover:${problem.isPaidOnly ? 'bg-gray-900' : 'bg-gray-700'} hover:${problem.isPaidOnly ? '' : 'scale-100'} transition-all`}
+                        <div className={`flex gap-3 text-lg ${problem.isPaidOnly ? 'text-gray-500 cursor-not-allowed' : 'cursor-pointer'} border border-gray-500 p-1 rounded-xl bg-gray-900 hover:${problem.isPaidOnly ? 'bg-gray-900' : 'bg-gray-700'} hover:${problem.isPaidOnly ? '' : 'scale-100'} transition-all`}
                         onClick={()=>{
                             handleProblemDescription(problem.titleSlug, problem.questionId);
                         }}>
@@ -97,7 +97,7 @@ function SideBar({setdescription, settitle}: {
                         </div>
                     ))}
 
-                    <div className="flex mt-8 justify-center border rounded-md border-gray-700 p-2 bg-slate-800">
+                    <div className="flex mt-5 justify-center border rounded-md border-gray-700 p-2 bg-slate-800">
                         <Pagination
                             count={100} 
                             color="primary" 
