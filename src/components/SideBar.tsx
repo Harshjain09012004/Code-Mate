@@ -19,7 +19,7 @@ function SideBar({setdescription, settitle}: {
     const [fetchingProblemDes, setfetchingProblemDes] = useState(false);
 
     useEffect(()=>{
-        axios.post('http://localhost:5500/fetchProblems', {
+        axios.post('https://code-mate-ws-service.onrender.com/fetchProblems', {
             limit: 10,
             skip: 0
         }).then(({data})=>{
@@ -37,7 +37,7 @@ function SideBar({setdescription, settitle}: {
     ) => {
         try{
             setloading(true);
-            const {data} = await axios.post('http://localhost:5500/fetchProblems', {
+            const {data} = await axios.post('https://code-mate-ws-service.onrender.com/fetchProblems', {
                 limit: 10,
                 skip: 20*(newPage-1)
             });
@@ -52,7 +52,7 @@ function SideBar({setdescription, settitle}: {
 
     const handleProblemDescription = async (titleSlug: string, Id: string)=>{
         setfetchingProblemDes(true);
-        const response = await axios.post('http://localhost:5500/fetchProblemDescription',
+        const response = await axios.post('https://code-mate-ws-service.onrender.com/fetchProblemDescription',
             {
                 titleSlug,
             }
