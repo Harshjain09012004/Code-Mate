@@ -1,18 +1,19 @@
-import { useState, DragEvent, useContext, useEffect } from 'react';
+import { useState, DragEvent, useContext, useEffect, useRef } from 'react';
 import AceEditor from 'react-ace';
 import axios from 'axios';
-import ReactMarkdown from 'react-markdown';
-import rehypeRaw from 'rehype-raw';
 import "../../imports/AceBuildImports";
-import DOMPurify from 'dompurify';
 import Languages from '../../constants/Languages';
 import Themes from '../../constants/Themes';
+
 import { PiCodeBold } from "react-icons/pi";
 import { MdOutlineDraw } from "react-icons/md";
-// import { IoVideocamOutline } from "react-icons/io5";
 import { PiChats } from "react-icons/pi";
 import { HiOutlineUsers } from "react-icons/hi2";
 import { HiOutlineShare } from "react-icons/hi2";
+import { PiFolderOpen } from "react-icons/pi";
+import { GoFileCode } from "react-icons/go";
+import { FaTasks } from "react-icons/fa";
+
 import Drawing from '../../components/drawing';
 import Navbar from '../../components/Navbar';
 import SideBar from '../../components/SideBar';
@@ -23,6 +24,10 @@ import MessagePanel from '../../components/messagePanel';
 import Participants from '../../components/participants';
 import UserName from '../../components/userName';
 import Judge0Response from '../../types/judge0Response.types';
+import WorkSpace from '../../components/workSpace';
+
+import { FileNodeData } from '../../types/fileNode.types';
+import { findFileNodeByid } from '../../utility/files.utility';
 
 type languageSupport = {
     languageName: string,
@@ -34,10 +39,8 @@ type themeStyle = {
     value: string
 }
 
-function Description({ descriptionText }: {descriptionText: string}) {
+function Description() {
 
-    const sanitizedMarkdown = DOMPurify.sanitize(descriptionText);
-    const [activeTab, setActiveTab] = useState('statement');
     const [testCaseTab, setTestCaseTab] = useState('input');
     const [leftWidth, setLeftWidth] = useState(50);
     const [isDragging, setIsDragging] = useState(false);
@@ -53,11 +56,38 @@ function Description({ descriptionText }: {descriptionText: string}) {
     const [share, setshare] = useState(false);
     const [messaging, setmessaging] = useState(false);
     const [participants, setparticipants] = useState(false);
+    const [workspace, setworkspace] = useState(false);
+
     const [messages, setmessages] = useState<{userName:string, userMessage:string}[]>([]);
     const [codeError, setcodeError] = useState(false);
+    
+    const [title, settitle] = useState('');
+    const [description, setdescription] = useState('');
+
+    const [treeData, settreeData] = useState<FileNodeData[]>(
+        [
+            { id: "src", name: "src", type: "folder",
+                children: [
+                    { id: "src/index.js", name: "index.js", type: "file" },
+                ]
+            },
+        ]
+    );
+    const [currentFileId, setcurrentFileId] = useState('src/index.js');
+    const [currentFileObject, setcurrentFileObject] = useState<FileNodeData | undefined>(
+        Array.isArray(treeData) && treeData[0]?.children ? treeData[0].children[0] : undefined
+    );
 
     const { socket, userName } = useContext(SocketContext);
     const { id } = useParams();
+    
+    const treeDataRef = useRef(treeData);
+    const currentFileIdRef = useRef(currentFileId);
+
+    useEffect(() => {
+        treeDataRef.current = treeData;
+        currentFileIdRef.current = currentFileId;
+    }, [treeData, currentFileId]);
 
     useEffect(()=>{
        socket.emit("join-room", {roomId: id, peerId: "43635"});
@@ -70,8 +100,15 @@ function Description({ descriptionText }: {descriptionText: string}) {
             })
         }
 
-        socket.on("update-code", ({newCode}: {newCode: string})=>{
-            setCode(newCode);
+        socket.on("update-code", ({newCode, filePath}: {newCode: string, filePath: string})=>{
+            const latestFileId = currentFileIdRef.current;
+            if(filePath === latestFileId){
+                setCode(newCode); 
+            }
+
+            const latestTreeData = treeDataRef.current;
+            const target = findFileNodeByid(filePath.split('/'), 0, latestTreeData[0]);
+            if(target) target.data = newCode;
         });
 
         socket.on("execution-updates", ({data}: {data: Judge0Response})=>{
@@ -146,14 +183,6 @@ function Description({ descriptionText }: {descriptionText: string}) {
 
     }
 
-    const isActiveTab = (tabName: string) => {
-        if(activeTab === tabName) {
-            return 'tab tab-active';
-        } else {
-            return 'tab'
-        }
-    }
-
     const isInputTabActive = (tabName: string) => {
         if(testCaseTab === tabName) {
             return 'tab tab-active';
@@ -165,7 +194,10 @@ function Description({ descriptionText }: {descriptionText: string}) {
     return (
         <>
             <Navbar />
-            <SideBar />
+            <SideBar 
+                settitle={settitle}
+                setdescription={setdescription}
+            />
 
             <div 
             className='flex gap-2 w-screen h-[calc(100vh-57px)]'
@@ -173,22 +205,26 @@ function Description({ descriptionText }: {descriptionText: string}) {
             onMouseUp={stopDragging}
             >
 
-                <div className='AdvancedFeaturesPanel flex flex-col gap-11 h-full text-3xl p-4 bg-gray-800'>
-                    <PiCodeBold title='Switch to coding' className='cursor-pointer active:scale-105' onClick={()=>setcodingMode(true)}/>
+                <div className='AdvancedFeaturesPanel flex flex-col gap-16 h-full text-3xl p-5 bg-gray-900 border-r border-gray-700'>
+                    <PiFolderOpen title='Work Space' className='cursor-pointer active:scale-110 transition-all hover:text-gray-500' onClick={()=>{
+                        if(!workspace) setLeftWidth(20);
+                        else setLeftWidth(50);
+                        setworkspace(!workspace);
+                    }}/>
 
-                    <MdOutlineDraw title='Switch to drawing' className='cursor-pointer active:scale-105' onClick={()=>setcodingMode(false)}/>
+                    <PiCodeBold title='Switch to coding' className='cursor-pointer active:scale-110 transition-all hover:text-gray-500' onClick={()=>setcodingMode(true)}/>
 
-                    {/* <IoVideocamOutline title='Start a session' className='cursor-pointer active:scale-105'/> */}
+                    <MdOutlineDraw title='Switch to drawing' className='cursor-pointer active:scale-110 transition-all hover:text-gray-500' onClick={()=>setcodingMode(false)}/>
 
-                    <PiChats title='Messaging' className='cursor-pointer active:scale-105' onClick={()=>{
+                    <PiChats title='Messaging' className='cursor-pointer active:scale-110 transition-all hover:text-gray-500' onClick={()=>{
                         setmessaging(!messaging);
                     }}/>
 
-                    <HiOutlineUsers title='Participants' className='cursor-pointer active:scale-105' onClick={()=>{
+                    <HiOutlineUsers title='Participants' className='cursor-pointer active:scale-110 transition-all hover:text-gray-500' onClick={()=>{
                         setparticipants(!participants);
                     }}/>
 
-                    <HiOutlineShare title='Invite Your Friends' className='cursor-pointer active:scale-105' onClick={()=>{
+                    <HiOutlineShare title='Invite Your Friends' className='cursor-pointer active:scale-110 transition-all hover:text-gray-500' onClick={()=>{
                         setshare(!share);
                     }}/>
                 </div>
@@ -215,21 +251,77 @@ function Description({ descriptionText }: {descriptionText: string}) {
 
                 <div className='leftPanel h-full [scrollbar-width:thin] overflow-auto' style={{ width: `${leftWidth}%`}}>
 
-                    <div role="tablist" className="tabs tabs-boxed w-3/5">
-                        <a onClick={() => setActiveTab('statement')} role="tab" className={isActiveTab("statement")}>Problem Statement</a>
-                        <a onClick={() => setActiveTab('editorial')} role="tab" className={isActiveTab("editorial")}>Editorial</a>
-                        <a onClick={() => setActiveTab('submissions')} role="tab" className={isActiveTab("submissions")}>Submissions</a>
-                    </div>
+                    {workspace && (
+                        <WorkSpace 
+                            treeData={treeData} 
+                            settreeData={settreeData}
+                            setLeftWidth={setLeftWidth}
+                            currentFileId={currentFileId}
+                            setcurrentFileId={setcurrentFileId}
+                            setcurrentFileObject={setcurrentFileObject}
+                            setCode={setCode}
+                            id={id}
+                        />
+                    )}
+                    
+                    {!workspace && (
+                        <>
+                            {description ? 
+                                (
+                                    <div>
+                                        <p className='sticky border top-0 right-0 border-gray-600 bg-green-700 text-white text-2xl font-medium p-2 mb-10 text-center'>
+                                            Problem Statement
+                                        </p>
 
-                    <div className='markdownViewer p-[20px] basis-1/2'>
-                        <ReactMarkdown rehypePlugins={[rehypeRaw]} className="prose">
-                            {sanitizedMarkdown}
-                        </ReactMarkdown>
-                    </div>
+                                        <p className='font-medium text-2xl p-2 text-white'>{title}</p>
 
+                                        <div className='p-2 text-xl tracking-wide flex leading-9'>   
+                                            <div dangerouslySetInnerHTML={{ __html: description }} />
+                                        </div>
+                                    </div>
+                                )
+                                :
+                                (
+                                    <div className='h-full flex flex-col items-center gap-24'>
+                                        <div className='m-10 font-medium text-4xl text-center flex flex-col gap-3 tracking-wider'>
+                                            <p>Welcome, {userName} 🎉</p>
+                                        </div>
+                                        
+
+                                        <div className='flex flex-col gap-16 justify-center items-center'>
+
+                                            <div className="flex flex-col gap-2 items-center justify-center text-gray-400 font-medium text-3xl">
+                                                <p>Go to your workspace </p>
+
+                                                <div className='flex gap-2 place-items-center text-2xl'>
+                                                    → By clicking
+                                                    <PiFolderOpen className='text-3xl text-gray-200'/>
+                                                    in leftBar
+                                                </div>
+                                            </div>
+
+                                            <div className='text-3xl text-center'>or</div>
+
+                                            <div className="flex flex-col gap-2 items-center justify-center text-gray-400 font-medium text-3xl">
+                                                <p>Select a problem from problem list </p>
+
+                                                <div className='flex gap-2 place-items-center text-2xl'>
+                                                    → By clicking 
+                                                    <FaTasks className='text-2xl text-gray-200'/>
+                                                     in leftBar
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div> 
+                                )
+                            }
+                        </>
+                    )}
+                    
                 </div>
 
-                <div className='divider cursor-col-resize w-[5px] bg-slate-200 h-full' onMouseDown={startDragging}></div>
+                <div className='divider cursor-col-resize w-[5px] bg-slate-200 h-full m-0' onMouseDown={startDragging}></div>
 
                 <div className='rightPanel h-full overflow-auto flex flex-col' style={{ width: `${100-leftWidth}%`}}>
                     {codingMode && (
@@ -272,25 +364,36 @@ function Description({ descriptionText }: {descriptionText: string}) {
                             </div>
 
                             <div className='editorContainer grow-[1]'>
-                                <AceEditor
-                                    mode={language}
-                                    theme={theme}
-                                    value={code}
-                                    onChange={(e: string) => {
-                                        setCode(e);
-                                        socket.emit("sync-code", { code , roomId: id});
-                                    }}
-                                    name='codeEditor'
-                                    className='editor'
-                                    style={{ width: '100%' }}
-                                    setOptions={{
+                                {currentFileObject?.type === "file" ? (
+                                    <AceEditor
+                                        mode={language}
+                                        theme={theme}
+                                        value={code}
+                                        onChange={(e: string) => {
+                                            currentFileObject.data = e;
+                                            setCode(e);
+                                            socket.emit("sync-code", { 
+                                                code: e, roomId: id, 
+                                                filePath: currentFileObject.id
+                                            });
+                                        }}
+                                        name='codeEditor'
+                                        className='editor'
+                                        style={{ width: '100%' }}
+                                        setOptions={{
                                         enableBasicAutocompletion: true,
                                         enableLiveAutocompletion: true,
                                         showLineNumbers: true,
-                                        fontSize: 16
-                                    }}
-                                    height='100%'
-                                />
+                                        fontSize: 16,
+                                        }}
+                                        height='100%'
+                                    />
+                                    ) : (
+                                    <div className="w-full h-full flex gap-3 items-center justify-center text-gray-400 font-medium text-2xl">
+                                        <GoFileCode className='text-white text-3xl'/>
+                                        <p>Please select a file to start writing code.</p>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="collapse bg-base-200 rounded-none">

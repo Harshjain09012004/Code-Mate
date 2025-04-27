@@ -1,6 +1,7 @@
 import Avatar from 'react-avatar';
 import { useContext } from "react";
 import { SocketContext } from "../context/SocketContext";
+import { FaTasks } from "react-icons/fa";
 
 function Navbar() {
     const { userName } = useContext(SocketContext);
@@ -9,9 +10,9 @@ function Navbar() {
         <div className="navbar bg-base-100 border-b-2 h-[55px]">
             <div className="navbar-start">
                 <div className="dropdown">
-                <label htmlFor="my-drawer">
+                <label htmlFor="my-drawer" title='List of Problems'>
                     <div role="button" className="btn btn-ghost btn-circle">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
+                        <FaTasks className='text-gray-300 text-2xl'/>
                     </div>
                 </label>
                 </div>
